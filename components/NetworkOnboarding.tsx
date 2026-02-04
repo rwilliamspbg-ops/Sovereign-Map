@@ -58,11 +58,11 @@ const NetworkOnboarding: React.FC<NetworkOnboardingProps> = ({ isOpen, onClose, 
               <div className="space-y-2">
                 <p className="text-slate-400 text-sm leading-relaxed mono">
                   {isDetecting ? (
-                    <span className="animate-pulse">> Analyzing hardware profile...</span>
+                    <span className="animate-pulse">&gt; Analyzing hardware profile...</span>
                   ) : (
                     <>
-                      > Hardware profile synchronized.<br/>
-                      > Spatial sensors detected.
+                      &gt; Hardware profile synchronized.<br/>
+                      &gt; Spatial sensors detected.
                     </>
                   )}
                 </p>
