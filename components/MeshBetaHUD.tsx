@@ -5,13 +5,12 @@ interface MeshBetaHUDProps {
     count: number;
     tflops: number;
     efficiency: number;
+    totalVoxels?: number;
   };
   isMainnet?: boolean;
   isSeeking?: boolean;
   isSimulation?: boolean;
 }
-
-const BUILD_ID = `PROD-${Math.random().toString(16).substring(2, 8).toUpperCase()}`;
 
 export const MeshMainnetHUD: React.FC<MeshBetaHUDProps> = ({ stats, isMainnet, isSeeking, isSimulation }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -30,7 +29,7 @@ export const MeshMainnetHUD: React.FC<MeshBetaHUDProps> = ({ stats, isMainnet, i
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">
                <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></div>
-               <span className="text-[6px] text-emerald-500 mono font-black uppercase">Active</span>
+               <span className="text-[6px] text-emerald-500 mono font-black uppercase">Live</span>
             </div>
             <button 
               onClick={() => setIsCollapsed(!isCollapsed)} 
@@ -58,9 +57,16 @@ export const MeshMainnetHUD: React.FC<MeshBetaHUDProps> = ({ stats, isMainnet, i
               </div>
             </div>
 
+            <div className="flex justify-between items-center py-2 border-y border-white/5">
+               <div className="text-[7px] text-slate-500 uppercase font-black mono">Spatial_Contribution</div>
+               <div className="text-[10px] font-black text-emerald-400 mono">
+                 {stats.totalVoxels?.toLocaleString() || 0} VOXELS
+               </div>
+            </div>
+
             <div className="space-y-1.5">
               <div className="flex justify-between text-[7px] font-black uppercase mono">
-                <span className="text-slate-500">Node Stability</span>
+                <span className="text-slate-500">Backbone Stability</span>
                 <span className={isSimulation ? 'text-amber-400' : 'text-cyan-400'}>{stats.efficiency.toFixed(0)}%</span>
               </div>
               <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 interface LaunchReadinessProps {
@@ -8,8 +7,13 @@ interface LaunchReadinessProps {
   stats: { count: number; efficiency: number };
 }
 
+interface CheckItem {
+  status: string;
+  label: string;
+}
+
 const LaunchReadiness: React.FC<LaunchReadinessProps> = ({ isOpen, onClose, onLaunch, stats }) => {
-  const [checks, setChecks] = useState({
+  const [checks, setChecks] = useState<Record<string, CheckItem>>({
     mesh: { status: 'PENDING', label: 'Enterprise Mesh Consistency' },
     peers: { status: 'PENDING', label: 'Commercial Node Quorum' },
     zk: { status: 'PENDING', label: 'Zero-Knowledge Prover Scale' },
@@ -67,7 +71,7 @@ const LaunchReadiness: React.FC<LaunchReadinessProps> = ({ isOpen, onClose, onLa
 
         <div className="p-8 space-y-6">
           <div className="space-y-3">
-            {Object.entries(checks).map(([key, check]) => (
+            {(Object.entries(checks) as [string, CheckItem][]).map(([key, check]) => (
               <div key={key} className="flex items-center justify-between p-4 bg-slate-950/50 border border-white/5 rounded-2xl transition-all duration-300">
                 <div className="flex items-center gap-4">
                   <div className={`w-2.5 h-2.5 rounded-full ${check.status === 'PASS' ? 'bg-emerald-500 shadow-[0_0_10px_emerald]' : check.status === 'WARN' ? 'bg-amber-500' : 'bg-slate-700 animate-pulse'}`}></div>

@@ -34,10 +34,11 @@ export interface MeshNode {
   lng: number;
   strength: number;
   timestamp: number;
-  classification?: 'Infrastructure' | 'Logistics' | 'Fleet' | 'Stationary' | 'Hub';
+  classification?: 'Infrastructure' | 'Logistics' | 'Fleet' | 'Stationary' | 'Hub' | 'Edge';
   predictedDrift?: { lat: number; lng: number };
   originSignature?: string;
   isVerified?: boolean;
+  peers?: string[]; // IDs of connected peers
 }
 
 export interface Voxel {
@@ -60,7 +61,7 @@ export interface SentinelRule {
 
 export type MapLayer = 'MESH' | 'RISK' | 'ASSETS' | 'TRAFFIC' | 'GRID' | 'SECURITY';
 
-export type UserRole = 'ARCHITECT' | 'GUARD' | 'SCOUT';
+export type UserRole = 'ARCHITECT' | 'GUARD' | 'SCOUT' | 'CONTRIBUTOR';
 
 export interface WalletState {
   connected: boolean;
@@ -71,12 +72,18 @@ export interface WalletState {
   rank: number;
   role?: UserRole;
   manifesto?: string;
+  contributionPoints?: number;
 }
 
 export interface WorkloadConfig {
   active: boolean;
   intensity: number;
   type: 'SPATIAL' | 'GEOPOLITICAL' | 'SENTINEL';
+  hardwareCapability?: {
+    lidar: boolean;
+    npu: boolean;
+    gps: boolean;
+  };
 }
 
 export interface SecurityEvent {
@@ -94,3 +101,5 @@ export interface ThreatAssessment {
   activeThreats: number;
   shieldStatus: 'NOMINAL' | 'DEGRADED' | 'REINFORCED';
 }
+
+export type ViewMode = 'MAP' | 'VOXEL' | 'NETWORK_GRAPH';

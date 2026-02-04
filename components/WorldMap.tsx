@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { feature } from 'topojson-client';
@@ -11,6 +10,7 @@ interface WorldMapProps {
   meshNodes?: MeshNode[];
   simulationOffset?: number;
   activeLayers?: MapLayer[];
+  onNodeClick?: (nodeId: string) => void;
 }
 
 const WorldMap: React.FC<WorldMapProps> = ({ 
@@ -18,7 +18,8 @@ const WorldMap: React.FC<WorldMapProps> = ({
   selectedId, 
   meshNodes = [], 
   simulationOffset = 0, 
-  activeLayers = [] 
+  activeLayers = [],
+  onNodeClick
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -155,7 +156,6 @@ const WorldMap: React.FC<WorldMapProps> = ({
       .style('cursor', 'crosshair')
       .on('mousemove', (e, d: any) => {
         const [mx, my] = d3.pointer(e, svgRef.current);
-        // Account for current zoom transform when getting lat/lng
         const transform = d3.zoomTransform(svgRef.current!);
         const [targetX, targetY] = transform.invert([mx, my]);
         const [lng, lat] = projection.invert!([targetX, targetY]) || [0, 0];
@@ -191,8 +191,8 @@ const WorldMap: React.FC<WorldMapProps> = ({
         .attr('y1', d => projection([d[0].lng, d[0].lat])![1])
         .attr('x2', d => projection([d[1].lng, d[1].lat])![0])
         .attr('y2', d => projection([d[1].lng, d[1].lat])![1])
-        .attr('stroke', simulationOffset > 0 ? 'rgba(251, 191, 36, 0.4)' : 'rgba(34, 211, 238, 0.3)')
-        .attr('stroke-width', 1)
+        .attr('stroke', d => (d[0].strength > 1.2 || d[1].strength > 1.2) ? 'rgba(255, 255, 255, 0.5)' : (simulationOffset > 0 ? 'rgba(251, 191, 36, 0.4)' : 'rgba(34, 211, 238, 0.3)'))
+        .attr('stroke-width', d => (d[0].strength > 1.2 || d[1].strength > 1.2) ? 2 : 1)
         .attr('stroke-dasharray', '5,3');
     }
 
@@ -207,25 +207,35 @@ const WorldMap: React.FC<WorldMapProps> = ({
           const projected = projection([d.lng, d.lat]);
           return projected ? `translate(${projected[0]}, ${projected[1]})` : 'translate(0,0)';
         })
+        .style('cursor', 'pointer')
         .on('mouseenter', (e, d) => setHoveredNode(d))
-        .on('mouseleave', () => setHoveredNode(null));
+        .on('mouseleave', () => setHoveredNode(null))
+        .on('click', (e, d) => {
+          e.stopPropagation();
+          onNodeClick?.(d.id);
+        });
 
       nodes.append('circle')
-        .attr('r', 10)
+        .attr('r', d => 10 * d.strength)
         .attr('class', 'pulse-bloom')
-        .attr('fill', d => simulationOffset > 0 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(59, 130, 246, 0.15)')
+        .attr('fill', d => {
+          if (d.strength > 1.2) return 'rgba(255, 255, 255, 0.3)';
+          return simulationOffset > 0 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(59, 130, 246, 0.15)';
+        })
         .attr('filter', 'url(#tacticalGlow)');
 
       nodes.append('circle')
-        .attr('r', d => layers.includes('ASSETS') && d.classification === 'Infrastructure' ? 6 : 4)
+        .attr('r', d => (layers.includes('ASSETS') && d.classification === 'Infrastructure' ? 6 : 4) * Math.sqrt(d.strength))
         .attr('fill', d => {
+          if (d.strength > 1.2) return '#ffffff'; // Highly active node
           if (simulationOffset > 0) return '#fbbf24';
           if (d.classification === 'Infrastructure') return '#f59e0b';
           if (d.classification === 'Logistics') return '#10b981';
           return '#06b6d4';
         })
         .style('stroke', 'rgba(255,255,255,0.4)')
-        .style('stroke-width', 0.5);
+        .style('stroke-width', 0.5)
+        .style('transition', 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)');
     }
 
     // Search Result Marker
@@ -359,9 +369,10 @@ const WorldMap: React.FC<WorldMapProps> = ({
              </div>
              <div>
                 <div className="text-[7px] text-slate-500 uppercase font-black">Signal</div>
-                <div className="text-[10px] text-emerald-500 font-black">NOMINAL</div>
+                <div className="text-[10px] text-emerald-500 font-black">STRENGTH: {(hoveredNode.strength * 100).toFixed(0)}%</div>
              </div>
           </div>
+          <div className="text-[7px] text-slate-600 italic mono mt-2">Click to optimize node strength</div>
         </div>
       )}
     </div>

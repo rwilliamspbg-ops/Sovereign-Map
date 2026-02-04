@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface HelpSystemProps {
@@ -8,29 +7,29 @@ interface HelpSystemProps {
 
 const HELP_SECTIONS = [
   {
+    title: "Join the Backbone",
+    icon: "B",
+    content: "Connect your identity to become a core node. Members receive SOV tokens for contributing NPU compute and spatial data. Use the 'Join Backbone' button to start your induction."
+  },
+  {
     title: "The Sovereign Mesh",
     icon: "Σ",
-    content: "A decentralized network of nodes (Peers) that perform local spatial compute. More peers increase the network's TFLOPS and power efficiency."
+    content: "A decentralized network of peers that perform local spatial compute. More peers increase the network's TFLOPS and power efficiency while securing the world's digital double."
   },
   {
-    title: "Predictive 'What-If'",
-    icon: "T",
-    content: "Uses Monte Carlo simulations to project node density and geopolitical risk up to 24 hours into the future. Move the temporal slider to engage."
-  },
-  {
-    title: "Sentinel Logic",
+    title: "Spatial Mapping",
     icon: "S",
-    content: "The system's automated reaction engine. Define rules like 'If Efficiency < 85% Then Reroute' to maintain 100% network uptime automatically."
+    content: "Utilize your device's monocular-inertial sensors to map physical environments into the decentralized Voxel store. Every scan strengthens the spatial commons."
   },
   {
     title: "Sovereign Analyst",
     icon: "A",
-    content: "Powered by Gemini 3. Provides boardroom-ready reports grounded in real-time web data and recent geopolitical events."
+    content: "Gemini-powered intelligence that provides geopolitical context and real-time news grounding for your spatial data. Access via the Intel_Feed or Live Voice."
   },
   {
-    title: "Spatial Voxel Engine",
-    icon: "V",
-    content: "Renders raw feature-point data captured via monocular-inertial SLAM into a collaborative 3D coordinate system."
+    title: "Earning SOV",
+    icon: "W",
+    content: "Your spatial contributions are quantified and rewarded. Rewards are based on mapping precision, node stability, and compute contribution."
   }
 ];
 
@@ -39,7 +38,7 @@ const HelpSystem: React.FC<HelpSystemProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-2xl animate-in fade-in duration-300">
-      <div className="w-full max-w-2xl bg-slate-900 border border-blue-500/30 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col">
+      <div className="w-full max-w-2xl bg-slate-900 border border-blue-500/30 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <div className="p-8 border-b border-white/5 flex justify-between items-center bg-slate-950/50">
           <div>
             <div className="mono text-[9px] text-blue-500 font-black uppercase tracking-[0.4em] mb-1">System_Documentation</div>
@@ -56,7 +55,7 @@ const HelpSystem: React.FC<HelpSystemProps> = ({ isOpen, onClose }) => {
               <div className="w-12 h-12 shrink-0 bg-blue-600/10 rounded-xl flex items-center justify-center font-black text-blue-500 border border-blue-500/20 group-hover:bg-blue-600 group-hover:text-white transition-all">
                 {section.icon}
               </div>
-              <div>
+              <div className="flex-1">
                 <h3 className="text-white font-black text-sm uppercase mb-2 tracking-wide">{section.title}</h3>
                 <p className="text-slate-400 text-xs leading-relaxed">{section.content}</p>
               </div>

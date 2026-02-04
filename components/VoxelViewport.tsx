@@ -10,12 +10,8 @@ interface VoxelViewportProps {
 
 const VoxelViewport: React.FC<VoxelViewportProps> = ({ voxels, isMainnet }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<{
-    scene: THREE.Scene;
-    camera: THREE.PerspectiveCamera;
-    renderer: THREE.WebGLRenderer;
-    points: THREE.Points;
-  } | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const geometryRef = useRef<THREE.BufferGeometry | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -32,6 +28,7 @@ const VoxelViewport: React.FC<VoxelViewportProps> = ({ voxels, isMainnet }) => {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
+    rendererRef.current = renderer;
     containerRef.current.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -44,6 +41,7 @@ const VoxelViewport: React.FC<VoxelViewportProps> = ({ voxels, isMainnet }) => {
 
     // Points Material
     const geometry = new THREE.BufferGeometry();
+    geometryRef.current = geometry;
     const material = new THREE.PointsMaterial({
       size: 1.5,
       vertexColors: true,
@@ -55,10 +53,9 @@ const VoxelViewport: React.FC<VoxelViewportProps> = ({ voxels, isMainnet }) => {
     const points = new THREE.Points(geometry, material);
     scene.add(points);
 
-    sceneRef.current = { scene, camera, renderer, points };
-
+    let animationId: number;
     const animate = () => {
-      requestAnimationFrame(animate);
+      animationId = requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
     };
@@ -75,7 +72,9 @@ const VoxelViewport: React.FC<VoxelViewportProps> = ({ voxels, isMainnet }) => {
     window.addEventListener('resize', handleResize);
 
     return () => {
+      cancelAnimationFrame(animationId);
       window.removeEventListener('resize', handleResize);
+      controls.dispose();
       renderer.dispose();
       if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
         containerRef.current.removeChild(renderer.domElement);
@@ -85,7 +84,7 @@ const VoxelViewport: React.FC<VoxelViewportProps> = ({ voxels, isMainnet }) => {
 
   // Update Points when voxels change
   useEffect(() => {
-    if (!sceneRef.current || voxels.length === 0) return;
+    if (!geometryRef.current || voxels.length === 0) return;
 
     const positions = new Float32Array(voxels.length * 3);
     const colors = new Float32Array(voxels.length * 3);
@@ -101,10 +100,10 @@ const VoxelViewport: React.FC<VoxelViewportProps> = ({ voxels, isMainnet }) => {
       colors[i * 3 + 2] = color.b;
     });
 
-    sceneRef.current.points.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    sceneRef.current.points.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    sceneRef.current.points.geometry.attributes.position.needsUpdate = true;
-    sceneRef.current.points.geometry.attributes.color.needsUpdate = true;
+    geometryRef.current.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometryRef.current.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geometryRef.current.attributes.position.needsUpdate = true;
+    geometryRef.current.attributes.color.needsUpdate = true;
   }, [voxels]);
 
   return (
