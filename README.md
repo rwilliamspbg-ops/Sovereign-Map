@@ -18,27 +18,6 @@ Sovereign Map is a high-fidelity spatial operating system and geopolitical analy
 2.  **Run Dev**: `npm run dev`
 3.  **Build**: `npm run build`
 
-## 🆘 Troubleshooting GitHub Sync
-
-If you are seeing "Failed to sync" or can't push `.yml` files, follow these steps:
-
-### 1. The ".github/" Folder Permission Issue
-GitHub sometimes restricts pushing to the `.github/` folder if you haven't configured a **Personal Access Token (PAT)** with "Workflow" permissions.
-- **Solution**: Go to GitHub Settings > Developer Settings > Tokens > Generate New Token (Classic). Select the `workflow` scope. Use this token as your password when pushing.
-
-### 2. Large File / node_modules Block
-If you tried to push before adding a `.gitignore`, your repo might be trying to upload 50MB+ of `node_modules`.
-- **Solution**: 
-  ```bash
-  git rm -r --cached node_modules
-  git add .
-  git commit -m "fix: remove node_modules from history"
-  git push origin main
-  ```
-
-### 3. Forced Push
-If the remote repository has diverged significantly:
-- **Solution**: `git push origin main --force` (Warning: This will overwrite remote history).
 
 ## 📜 Governance
 This project operates under the **SGP (Spatial Governance Proposal)** framework. Current active proposal: **SGP-001 (Heritage Sanctuaries)**.
